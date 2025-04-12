@@ -1,7 +1,7 @@
 const User = require("../models/user");
 const { BAD_REQUEST, NOT_FOUND, SERVER_ERROR } = require("../utils/errors");
 
-// GET /users
+// GET
 const getUsers = (req, res) => {
   User.find({})
     .then((users) => res.send(users))
@@ -13,7 +13,7 @@ const getUsers = (req, res) => {
     });
 };
 
-// POST /users
+// POST
 const createUser = (req, res) => {
   const { name, avatar } = req.body;
 
@@ -31,7 +31,7 @@ const createUser = (req, res) => {
     });
 };
 
-// GET /users/:userId
+// GET
 const getUser = (req, res) => {
   const { userId } = req.params;
 

@@ -1,7 +1,7 @@
 const ClothingItem = require("../models/clothingItem");
 const { BAD_REQUEST, NOT_FOUND, SERVER_ERROR } = require("../utils/errors");
 
-// GET /items
+// GET
 const getItems = (req, res) => {
   ClothingItem.find({})
     .then((items) => res.send(items))
@@ -13,7 +13,7 @@ const getItems = (req, res) => {
     });
 };
 
-// POST /items
+// POST
 const createClothingItem = (req, res) => {
   const { name, weather, imageUrl } = req.body;
   const owner = req.user._id;
@@ -31,7 +31,7 @@ const createClothingItem = (req, res) => {
     });
 };
 
-// DELETE /items/:itemId
+// DELETE
 const deleteItem = (req, res) => {
   const { itemId } = req.params;
 
@@ -56,7 +56,7 @@ const deleteItem = (req, res) => {
     });
 };
 
-// PUT /items/:itemId/likes
+// PUT
 const likeItem = (req, res) => {
   ClothingItem.findByIdAndUpdate(
     req.params.itemId,
@@ -83,7 +83,7 @@ const likeItem = (req, res) => {
     });
 };
 
-// DELETE /items/:itemId/likes
+// DELETE
 const dislikeItem = (req, res) => {
   ClothingItem.findByIdAndUpdate(
     req.params.itemId,
