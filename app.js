@@ -1,11 +1,11 @@
 const express = require("express");
 const mongoose = require("mongoose");
-const mainRouter = require("./routes/index.js");
+const mainRouter = require("./routes");
 
 const app = express();
 const { PORT = 3001 } = process.env;
 
-// Connect to MongoDB
+// MongoDB
 mongoose
   .connect("mongodb://127.0.0.1:27017/wtwr_db")
   .then(() => {
@@ -13,21 +13,21 @@ mongoose
   })
   .catch(console.error);
 
-// Parse incoming JSON
+// JSON
 app.use(express.json());
 
-// ✅ Temporary authorization middleware
+// Temp middleware
 app.use((req, res, next) => {
   req.user = {
-    _id: "5d8b8592978f8bd833ca8133", // ← replace this with your actual test user _id
+    _id: "5d8b8592978f8bd833ca8133",
   };
   next();
 });
 
-// Mount the main router
+// Router
 app.use("/", mainRouter);
 
-// 404 for unknown routes
+// 404 routes
 app.use((req, res) => {
   res.status(404).send({ message: "Requested resource not found" });
 });
