@@ -24,8 +24,7 @@ const createUser = (req, res) => {
       if (err.name === "ValidationError") {
         return res.status(BAD_REQUEST).send({ message: "Invalid user data" });
       }
-
-      res
+      return res
         .status(SERVER_ERROR)
         .send({ message: "An error has occurred on the server." });
     });
@@ -55,7 +54,7 @@ const getUser = (req, res) => {
         return res.status(NOT_FOUND).send({ message: "User not found" });
       }
 
-      res
+      return res
         .status(SERVER_ERROR)
         .send({ message: "An error has occurred on the server." });
     });
