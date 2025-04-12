@@ -40,7 +40,7 @@ const getUser = (req, res) => {
       error.statusCode = NOT_FOUND;
       throw error;
     })
-    .then((user) => res.status(200).send(user))
+    .then((users) => res.send(users))
     .catch((err) => {
       console.error(
         `Error ${err.name} with the message "${err.message}" occurred`
