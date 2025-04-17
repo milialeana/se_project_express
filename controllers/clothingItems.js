@@ -1,7 +1,7 @@
 const ClothingItem = require("../models/clothingItem");
 const { BAD_REQUEST, NOT_FOUND, SERVER_ERROR } = require("../utils/errors");
 
-// GET
+// Get
 const getItems = (req, res) => {
   ClothingItem.find({})
     .then((items) => res.send(items))
@@ -13,7 +13,7 @@ const getItems = (req, res) => {
     });
 };
 
-// POST
+// Post
 const createClothingItem = (req, res) => {
   const { name, weather, imageUrl } = req.body;
   const owner = req.user._id;
@@ -31,32 +31,45 @@ const createClothingItem = (req, res) => {
     });
 };
 
-// DELETE
+// Delete
 const deleteItem = (req, res) => {
   const { itemId } = req.params;
 
-  ClothingItem.findByIdAndDelete(itemId)
+  ClothingItem.findById(itemId)
     .orFail(() => {
       const error = new Error("Item not found");
       error.statusCode = NOT_FOUND;
       throw error;
     })
-    .then((item) => res.send(item))
+    .then((item) => {
+      if (!item.owner.equals(req.user._id)) {
+        return res
+          .status(403)
+          .send({ message: "You can only delete your own items" });
+      }
+
+      return ClothingItem.findByIdAndDelete(itemId).then(() =>
+        res.status(200).send({ message: "Item deleted successfully" })
+      );
+    })
     .catch((err) => {
-      console.error(err);
+      console.error("Delete error:", err);
+
       if (err.name === "CastError") {
         return res.status(BAD_REQUEST).send({ message: "Invalid item ID" });
       }
+
       if (err.statusCode === NOT_FOUND) {
         return res.status(NOT_FOUND).send({ message: "Item not found" });
       }
+
       return res
         .status(SERVER_ERROR)
         .send({ message: "An error has occurred on the server." });
     });
 };
 
-// PUT
+// Put
 const likeItem = (req, res) => {
   ClothingItem.findByIdAndUpdate(
     req.params.itemId,
@@ -83,7 +96,7 @@ const likeItem = (req, res) => {
     });
 };
 
-// DELETE
+// Dislike
 const dislikeItem = (req, res) => {
   ClothingItem.findByIdAndUpdate(
     req.params.itemId,

@@ -1,38 +1,40 @@
 const express = require("express");
 const mongoose = require("mongoose");
-const mainRouter = require("./routes");
-const { NOT_FOUND } = require("./utils/errors");
+const cors = require("cors");
 
-const app = express();
 const { PORT = 3001 } = process.env;
+const app = express();
 
-// MongoDB
-mongoose
-  .connect("mongodb://127.0.0.1:27017/wtwr_db")
-  .then(() => {
-    console.log("Connected to DB");
-  })
-  .catch(console.error);
-
-// JSON
+app.use(cors());
 app.use(express.json());
 
-// Temp middleware
-app.use((req, res, next) => {
-  req.user = {
-    _id: "5d8b8592978f8bd833ca8133",
-  };
-  next();
+// DB connection
+mongoose.connect("mongodb://127.0.0.1:27017/wtwr_db", {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
 });
 
-// Router
-app.use("/", mainRouter);
+// Controllers and middleware
+const { login, createUser } = require("./controllers/users");
+const auth = require("./middlewares/auth");
+const router = require("./routes/index");
 
-// 404 routes
+// Public routes
+app.post("/signup", createUser);
+app.post("/signin", login);
+
+// Global auth middleware
+app.use(auth);
+
+// Protected routes
+app.use("/", router);
+
+// Fallback
 app.use((req, res) => {
-  res.status(NOT_FOUND).send({ message: "Requested resource not found" });
+  res.status(404).send({ message: "Requested resource not found" });
 });
 
+// Start server
 app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+  console.log(`App listening at http://localhost:${PORT}`);
 });
