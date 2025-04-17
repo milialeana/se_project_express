@@ -15,6 +15,6 @@ module.exports = (req, res, next) => {
     req.user = payload;
     next();
   } catch (err) {
-    res.status(401).send({ message: "Invalid token" });
+    return res.status(401).send({ message: "Invalid token" });
   }
 };

@@ -14,16 +14,18 @@ const createUser = (req, res) => {
     .then((user) => {
       const userData = user.toObject();
       delete userData.password;
-      res.status(201).send(userData);
+      return res.status(201).send(userData);
     })
     .catch((err) => {
       if (err.code === 11000) {
-        return res.status(409).send({ message: "Email already exists" }); // ✅ required
+        return res.status(409).send({ message: "Email already exists" });
       }
       if (err.name === "ValidationError") {
         return res.status(400).send({ message: "Invalid user data" });
       }
-      res.status(500).send({ message: "An error occurred on the server." });
+      return res
+        .status(500)
+        .send({ message: "An error occurred on the server." });
     });
 };
 
@@ -40,10 +42,10 @@ const login = (req, res) => {
       const token = jwt.sign({ _id: user._id }, JWT_SECRET, {
         expiresIn: "7d",
       });
-      res.send({ token });
+      return res.send({ token });
     })
     .catch(() => {
-      res.status(401).send({ message: "Invalid email or password" });
+      return res.status(401).send({ message: "Invalid email or password" });
     });
 };
 
