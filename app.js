@@ -1,6 +1,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
+const { NOT_FOUND } = require("./utils/errors");
 
 const { PORT = 3001 } = process.env;
 const app = express();
@@ -14,24 +15,19 @@ mongoose.connect("mongodb://localhost:27017/wtwr_db", {
   useUnifiedTopology: true,
 });
 
-// Controllers and middleware
-const { login, createUser } = require("./controllers/users");
-const auth = require("./middlewares/auth");
+// Route index
 const router = require("./routes/index");
-
-// Public routes
-app.post("/signup", createUser);
-app.post("/signin", login);
-
-// Global auth middleware
-app.use(auth);
 
 // Protected routes
 app.use("/", router);
 
+// Middleware
+const auth = require("./middlewares/auth");
+app.use(auth);
+
 // Fallback
 app.use((req, res) => {
-  res.status(404).send({ message: "Requested resource not found" });
+  res.status(NOT_FOUND).send({ message: "Requested resource not found" });
 });
 
 // Start server
