@@ -34,18 +34,26 @@ const login = (req, res) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
-    return res.status(400).send({ message: "Email and password are required" });
+    return res
+      .status(400)
+      .send({ message: "The password and email fields are required" });
   }
 
   return User.findUserByCredentials(email, password)
-    .then((user) =>
-      res.send({
-        token: jwt.sign({ _id: user._id }, JWT_SECRET, { expiresIn: "7d" }),
-      })
-    )
-    .catch(() =>
-      res.status(401).send({ message: "Invalid email or password" })
-    );
+    .then((user) => {
+      const token = jwt.sign({ _id: user._id }, JWT_SECRET, {
+        expiresIn: "7d",
+      });
+      return res.send({ token });
+    })
+    .catch((err) => {
+      if (err.message === "Incorrect email or password") {
+        return res.status(401).send({ message: "Incorrect email or password" });
+      }
+      return res
+        .status(500)
+        .send({ message: "An error occurred on the server" });
+    });
 };
 
 // Existing User
