@@ -57,8 +57,8 @@ const login = (req, res) => {
 };
 
 // Existing User
-const getCurrentUser = (req, res) => {
-  return User.findById(req.user._id)
+const getCurrentUser = (req, res) =>
+  User.findById(req.user._id)
     .then((user) => {
       if (!user) {
         return res.status(NOT_FOUND).send({ message: "User not found" });
@@ -71,7 +71,6 @@ const getCurrentUser = (req, res) => {
         .status(SERVER_ERROR)
         .send({ message: "An error has occurred on the server." });
     });
-};
 
 // Update User
 const updateUser = (req, res) => {
