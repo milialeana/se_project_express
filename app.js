@@ -20,6 +20,7 @@ mongoose.connect("mongodb://localhost:27017/wtwr_db", {
 
 // Unified route handling
 const router = require("./routes/index");
+
 app.use("/", router);
 
 // Fallback
