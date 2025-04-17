@@ -1,16 +1,19 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/user");
+
 const {
   BAD_REQUEST,
-  NOT_FOUND,
   SERVER_ERROR,
-  CREATED,
+  CONFLICT,
   UNAUTHORIZED,
+  NOT_FOUND,
+  CREATED,
 } = require("../utils/errors");
+
 const { JWT_SECRET = "some-secret-key" } = require("../utils/config");
 
-// Create
+// Create user
 const createUser = (req, res) => {
   const { name, avatar, email, password } = req.body;
 
@@ -26,12 +29,14 @@ const createUser = (req, res) => {
       if (err.code === 11000) {
         return res.status(CONFLICT).send({ message: "Email already exists" });
       }
+
       if (err.name === "ValidationError") {
         return res.status(BAD_REQUEST).send({ message: "Invalid user data" });
       }
+
       return res
         .status(SERVER_ERROR)
-        .send({ message: "An error occurred on the server." });
+        .send({ message: "An error occurred on the server" });
     });
 };
 
@@ -58,13 +63,14 @@ const login = (req, res) => {
           .status(UNAUTHORIZED)
           .send({ message: "Incorrect email or password" });
       }
+
       return res
         .status(SERVER_ERROR)
         .send({ message: "An error occurred on the server" });
     });
 };
 
-// Existing User
+// Get current user
 const getCurrentUser = (req, res) =>
   User.findById(req.user._id)
     .then((user) => {
@@ -80,7 +86,7 @@ const getCurrentUser = (req, res) =>
         .send({ message: "An error has occurred on the server." });
     });
 
-// Update User
+// Update user
 const updateUser = (req, res) => {
   const { name, avatar } = req.body;
 

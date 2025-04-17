@@ -1,11 +1,13 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
+const helmet = require("helmet");
 const { NOT_FOUND } = require("./utils/errors");
 
 const { PORT = 3001 } = process.env;
 const app = express();
 
+app.use(helmet());
 app.use(cors());
 app.use(express.json());
 
@@ -15,15 +17,9 @@ mongoose.connect("mongodb://localhost:27017/wtwr_db", {
   useUnifiedTopology: true,
 });
 
-// Route index
+// Unified route handling
 const router = require("./routes/index");
-
-// Protected routes
 app.use("/", router);
-
-// Middleware
-const auth = require("./middlewares/auth");
-app.use(auth);
 
 // Fallback
 app.use((req, res) => {
