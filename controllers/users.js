@@ -43,9 +43,9 @@ const login = (req, res) => {
         token: jwt.sign({ _id: user._id }, JWT_SECRET, { expiresIn: "7d" }),
       })
     )
-    .catch(() => {
-      return res.status(401).send({ message: "Invalid email or password" });
-    });
+    .catch(() =>
+      res.status(401).send({ message: "Invalid email or password" })
+    );
 };
 
 // Existing User
