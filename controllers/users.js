@@ -8,7 +8,7 @@ const { JWT_SECRET = "some-secret-key" } = require("../utils/config");
 const createUser = (req, res) => {
   const { name, avatar, email, password } = req.body;
 
-  bcrypt
+  return bcrypt
     .hash(password, 10)
     .then((hash) => User.create({ name, avatar, email, password: hash }))
     .then((user) => {
@@ -37,13 +37,12 @@ const login = (req, res) => {
     return res.status(400).send({ message: "Email and password are required" });
   }
 
-  User.findUserByCredentials(email, password)
-    .then((user) => {
-      const token = jwt.sign({ _id: user._id }, JWT_SECRET, {
-        expiresIn: "7d",
-      });
-      return res.send({ token });
-    })
+  return User.findUserByCredentials(email, password)
+    .then((user) =>
+      res.send({
+        token: jwt.sign({ _id: user._id }, JWT_SECRET, { expiresIn: "7d" }),
+      })
+    )
     .catch(() => {
       return res.status(401).send({ message: "Invalid email or password" });
     });
@@ -51,12 +50,12 @@ const login = (req, res) => {
 
 // Existing User
 const getCurrentUser = (req, res) => {
-  User.findById(req.user._id)
+  return User.findById(req.user._id)
     .then((user) => {
       if (!user) {
         return res.status(NOT_FOUND).send({ message: "User not found" });
       }
-      res.send(user);
+      return res.send(user);
     })
     .catch((err) => {
       console.error(err);
@@ -70,7 +69,7 @@ const getCurrentUser = (req, res) => {
 const updateUser = (req, res) => {
   const { name, avatar } = req.body;
 
-  User.findByIdAndUpdate(
+  return User.findByIdAndUpdate(
     req.user._id,
     { name, avatar },
     { new: true, runValidators: true }
@@ -79,7 +78,7 @@ const updateUser = (req, res) => {
       if (!user) {
         return res.status(NOT_FOUND).send({ message: "User not found" });
       }
-      res.send(user);
+      return res.send(user);
     })
     .catch((err) => {
       console.error(err);
