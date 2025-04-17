@@ -1,7 +1,13 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/user");
-const { BAD_REQUEST, NOT_FOUND, SERVER_ERROR } = require("../utils/errors");
+const {
+  BAD_REQUEST,
+  NOT_FOUND,
+  SERVER_ERROR,
+  CREATED,
+  UNAUTHORIZED,
+} = require("../utils/errors");
 const { JWT_SECRET = "some-secret-key" } = require("../utils/config");
 
 // Create
@@ -14,17 +20,17 @@ const createUser = (req, res) => {
     .then((user) => {
       const userData = user.toObject();
       delete userData.password;
-      return res.status(201).send(userData);
+      return res.status(CREATED).send(userData);
     })
     .catch((err) => {
       if (err.code === 11000) {
-        return res.status(409).send({ message: "Email already exists" });
+        return res.status(CONFLICT).send({ message: "Email already exists" });
       }
       if (err.name === "ValidationError") {
-        return res.status(400).send({ message: "Invalid user data" });
+        return res.status(BAD_REQUEST).send({ message: "Invalid user data" });
       }
       return res
-        .status(500)
+        .status(SERVER_ERROR)
         .send({ message: "An error occurred on the server." });
     });
 };
@@ -35,7 +41,7 @@ const login = (req, res) => {
 
   if (!email || !password) {
     return res
-      .status(400)
+      .status(BAD_REQUEST)
       .send({ message: "The password and email fields are required" });
   }
 
@@ -48,10 +54,12 @@ const login = (req, res) => {
     })
     .catch((err) => {
       if (err.message === "Incorrect email or password") {
-        return res.status(401).send({ message: "Incorrect email or password" });
+        return res
+          .status(UNAUTHORIZED)
+          .send({ message: "Incorrect email or password" });
       }
       return res
-        .status(500)
+        .status(SERVER_ERROR)
         .send({ message: "An error occurred on the server" });
     });
 };
