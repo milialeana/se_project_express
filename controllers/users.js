@@ -15,7 +15,9 @@ const { JWT_SECRET = "some-secret-key" } = require("../utils/config");
 
 // Create user
 const createUser = (req, res) => {
-  const { name, avatar, email, password } = req.body;
+  const { name, email, password } = req.body;
+
+  const avatar = req.body.avatar || "";
 
   return bcrypt
     .hash(password, 10)
@@ -89,6 +91,10 @@ const getCurrentUser = (req, res) =>
 // Update user
 const updateUser = (req, res) => {
   const { name, avatar } = req.body;
+
+  const updateData = {};
+  if (name) updateData.name = name;
+  if (avatar !== undefined) updateData.avatar = avatar;
 
   return User.findByIdAndUpdate(
     req.user._id,
