@@ -5,9 +5,14 @@ const { login, createUser } = require("../controllers/users");
 const { getItems } = require("../controllers/clothingItems");
 const auth = require("../middlewares/auth");
 
+const {
+  validateUserSignup,
+  validateUserLogin,
+} = require("../middlewares/validation");
+
 // Public routes
-router.post("/signup", createUser);
-router.post("/signin", login);
+router.post("/signup", validateUserSignup, createUser);
+router.post("/signin", validateUserLogin, login);
 router.get("/items", getItems);
 
 // Middleware

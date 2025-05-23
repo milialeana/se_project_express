@@ -28,5 +28,6 @@ module.exports = {
         allowAfterThis: true,
       },
     ],
+    "no-unused-vars": ["error", { argsIgnorePattern: "^next$" }],
   },
 };
