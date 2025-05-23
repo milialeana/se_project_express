@@ -7,7 +7,7 @@ const {
   ConflictError,
   UnauthorizedError,
   NotFoundError,
-} = require("../utils/customErrors");
+} = require("../utils/ors");
 
 const { CREATED } = require("../utils/errors");
 const { JWT_SECRET } = require("../utils/config");
@@ -67,7 +67,7 @@ const getCurrentUser = (req, res, next) => {
       if (!user) {
         throw new NotFoundError("User not found");
       }
-      res.send(user);
+      return res.send(user);
     })
     .catch(next);
 };

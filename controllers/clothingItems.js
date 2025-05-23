@@ -5,7 +5,7 @@ const {
   BadRequestError,
   ForbiddenError,
   NotFoundError,
-} = require("../utils/customErrors");
+} = require("../utils/errors");
 
 // Get all items
 const getItems = (req, res, next) => {
