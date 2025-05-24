@@ -1,20 +1,17 @@
 const ClothingItem = require("../models/clothingItem");
 
+const { CREATED, OK } = require("../utils/statusCodes");
 const {
-  CREATED,
-  OK,
   BadRequestError,
   ForbiddenError,
   NotFoundError,
 } = require("../utils/errors");
 
 // Get all items
-const getItems = (res, next) => {
+const getItems = (req, res, next) => {
   ClothingItem.find({})
     .lean()
-    .then((items) => {
-      return res.send(items);
-    })
+    .then((items) => res.send(items))
     .catch(next);
 };
 
@@ -24,9 +21,7 @@ const createClothingItem = (req, res, next) => {
   const owner = req.user._id;
 
   ClothingItem.create({ name, weather, imageUrl, owner })
-    .then((item) => {
-      return res.status(CREATED).send(item);
-    })
+    .then((item) => res.status(CREATED).send(item))
     .catch((err) => {
       if (err.name === "ValidationError") {
         return next(new BadRequestError("Invalid item data"));
@@ -49,9 +44,7 @@ const deleteItem = (req, res, next) => {
       }
       return ClothingItem.findByIdAndDelete(itemId);
     })
-    .then(() => {
-      return res.status(OK).send({ message: "Item deleted successfully" });
-    })
+    .then(() => res.status(OK).send({ message: "Item deleted successfully" }))
     .catch((err) => {
       if (err.name === "CastError") {
         return next(new BadRequestError("Invalid item ID"));
@@ -70,9 +63,7 @@ const likeItem = (req, res, next) => {
     .orFail(() => {
       throw new NotFoundError("Item not found");
     })
-    .then((item) => {
-      return res.send(item);
-    })
+    .then((item) => res.send(item))
     .catch((err) => {
       if (err.name === "CastError") {
         return next(new BadRequestError("Invalid item ID"));
@@ -91,9 +82,7 @@ const dislikeItem = (req, res, next) => {
     .orFail(() => {
       throw new NotFoundError("Item not found");
     })
-    .then((item) => {
-      return res.send(item);
-    })
+    .then((item) => res.send(item))
     .catch((err) => {
       if (err.name === "CastError") {
         return next(new BadRequestError("Invalid item ID"));
