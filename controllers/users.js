@@ -1,16 +1,15 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/user");
+const { JWT_SECRET } = require("../utils/config");
 
 const {
+  CREATED,
   BadRequestError,
   ConflictError,
   UnauthorizedError,
   NotFoundError,
-} = require("../utils/ors");
-
-const { CREATED } = require("../utils/errors");
-const { JWT_SECRET } = require("../utils/config");
+} = require("../utils/errors");
 
 // Create a new user
 const createUser = (req, res, next) => {
@@ -22,7 +21,7 @@ const createUser = (req, res, next) => {
     .then((user) => {
       const userData = user.toObject();
       delete userData.password;
-      res.status(CREATED).send(userData);
+      return res.status(CREATED).send(userData);
     })
     .catch((err) => {
       if (err.code === 11000) {
@@ -50,7 +49,7 @@ const login = (req, res, next) => {
       const token = jwt.sign({ _id: user._id }, JWT_SECRET, {
         expiresIn: "7d",
       });
-      res.send({ token });
+      return res.send({ token });
     })
     .catch((err) => {
       if (err.message === "Incorrect email or password") {
@@ -72,6 +71,22 @@ const getCurrentUser = (req, res, next) => {
     .catch(next);
 };
 
+const getUserById = (req, res, next) => {
+  User.findById(req.params.userId)
+    .then((user) => {
+      if (!user) {
+        throw new NotFoundError("User not found");
+      }
+      return res.send(user);
+    })
+    .catch((err) => {
+      if (err.name === "CastError") {
+        return next(new BadRequestError("Invalid user ID"));
+      }
+      return next(err);
+    });
+};
+
 // Update authenticated user's profile
 const updateUser = (req, res, next) => {
   const { name, avatar } = req.body;
@@ -85,30 +100,11 @@ const updateUser = (req, res, next) => {
       if (!user) {
         throw new NotFoundError("User not found");
       }
-      res.send(user);
+      return res.send(user);
     })
     .catch((err) => {
       if (err.name === "ValidationError") {
         return next(new BadRequestError("Invalid data"));
-      }
-      return next(err);
-    });
-};
-
-// Get user by ID
-const getUserById = (req, res, next) => {
-  const { userId } = req.params;
-
-  User.findById(userId)
-    .then((user) => {
-      if (!user) {
-        throw new NotFoundError("User not found");
-      }
-      res.send(user);
-    })
-    .catch((err) => {
-      if (err.name === "CastError") {
-        return next(new BadRequestError("Invalid user ID format"));
       }
       return next(err);
     });
