@@ -16,7 +16,7 @@ const {
 const createUser = (req, res, next) => {
   const { name, email, password, avatar = "" } = req.body;
 
-  bcrypt
+  return bcrypt
     .hash(password, 10)
     .then((hash) => User.create({ name, avatar, email, password: hash }))
     .then((user) => {
@@ -45,13 +45,12 @@ const login = (req, res, next) => {
     );
   }
 
-  User.findUserByCredentials(email, password)
-    .then((user) => {
-      const token = jwt.sign({ _id: user._id }, JWT_SECRET, {
-        expiresIn: "7d",
-      });
-      return res.send({ token });
-    })
+  return User.findUserByCredentials(email, password)
+    .then((user) =>
+      res.send({
+        token: jwt.sign({ _id: user._id }, JWT_SECRET, { expiresIn: "7d" }),
+      })
+    )
     .catch((err) => {
       if (err.message === "Incorrect email or password") {
         return next(new UnauthorizedError("Incorrect email or password"));
@@ -61,19 +60,17 @@ const login = (req, res, next) => {
 };
 
 // Get authenticated user's data
-const getCurrentUser = (req, res, next) => {
-  User.findById(req.user._id)
+const getCurrentUser = (req, res, next) => User.findById(req.user._id)
     .then((user) => {
       if (!user) {
         throw new NotFoundError("User not found");
       }
       return res.send(user);
     })
-    .catch(next);
-};
+    .catch((err) => next(err));
 
-const getUserById = (req, res, next) => {
-  User.findById(req.params.userId)
+// Get any user by ID
+const getUserById = (req, res, next) => User.findById(req.params.userId)
     .then((user) => {
       if (!user) {
         throw new NotFoundError("User not found");
@@ -86,13 +83,12 @@ const getUserById = (req, res, next) => {
       }
       return next(err);
     });
-};
 
 // Update authenticated user's profile
 const updateUser = (req, res, next) => {
   const { name, avatar } = req.body;
 
-  User.findByIdAndUpdate(
+  return User.findByIdAndUpdate(
     req.user._id,
     { name, avatar },
     { new: true, runValidators: true }
