@@ -26,3 +26,8 @@ The back-end server provides the following functionality:
 - Validator.js — Validate avatar and image URLs
 - nodemon — Auto-reload the server during development
 - Custom error handling — Centralized, structured responses for all error types
+
+## Deployment
+
+Frontend: https://wearcheck.ignorelist.com  
+Backend API: https://api.wearcheck.ignorelist.com

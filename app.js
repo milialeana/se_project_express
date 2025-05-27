@@ -24,6 +24,12 @@ mongoose.connect("mongodb://localhost:27017/wtwr_db", {
   useUnifiedTopology: true,
 });
 
+app.get("/crash-test", () => {
+  setTimeout(() => {
+    throw new Error("Server will crash now");
+  }, 0);
+});
+
 // Request logging middleware
 app.use(requestLogger);
 
