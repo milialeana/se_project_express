@@ -6,7 +6,7 @@ const helmet = require("helmet");
 const { errors } = require("celebrate");
 
 const router = require("./routes/index");
-const { NOT_FOUND } = require("./utils/errors");
+const NotFoundError = require("./utils/errors/NotFoundError");
 const errorHandler = require("./middlewares/error-handler");
 const { requestLogger, errorLogger } = require("./middlewares/logger");
 
@@ -37,8 +37,8 @@ app.use(requestLogger);
 app.use("/", router);
 
 // 404 fallback for unmatched routes
-app.use((req, res) => {
-  res.status(NOT_FOUND).send({ message: "Requested resource not found" });
+app.use((req, res, next) => {
+  next(new NotFoundError());
 });
 
 // Error logging (after routes)
